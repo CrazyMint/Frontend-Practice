@@ -1,41 +1,101 @@
 const HOST = "server.com/";
 
-// document.onclick = () => {
-//   api.get(HOST, {}, (response) => {
-//     document.body.innerHTML += response;
-//   });
-// };
+// Event
 
-const goElement = document.getElementById("go");
-goElement.onclick = () => {
-  const inputElement = document.getElementById("test");
-  api.get(HOST + "menus", { menu: inputElement.value }, displayText);
+const populateCategories = (category) => {
+  const activeMenuItemName = activeMenuItem.children[0].innerHTML;
+  api.get(
+    HOST + "categories",
+    { category, menuItem: activeMenuItemName },
+    (response) => {
+      const categories = response;
+      let categoryList = "";
+      for (let cate of categories) {
+        const categoryElement = `
+        <li class="menu__sub__categoties__item">
+          <a href="#" class="menu__sub__categories__item__link">${cate}</a>
+        </li>
+      `;
+        categoryList += categoryElement;
+      }
+      const submenuElement = document.getElementsByClassName(
+        `menu__sub__categories__items--${category}`
+      )[0];
+      submenuElement.innerHTML = categoryList;
+    }
+  );
 };
 
-const displayText = (response) => {
-  const outputElement = document.getElementById("output");
-  outputElement.innerHTML += response + "<br>";
+const showSubmenu = () => {
+  const submenu = document.getElementsByClassName("menu__sub")[0];
+  submenu.style.display = "block";
+
+  populateCategories("top");
+  populateCategories("additional");
 };
+
+const hideSubmenu = () => {
+  const submenu = document.getElementsByClassName("menu__sub")[0];
+  submenu.style.display = "none";
+};
+
+let activeMenuItem = null;
+
+const onMenuItemMouseEnter = (newActiveItem) => {
+  if (activeMenuItem) {
+    activeMenuItem.classList.remove("menu__main__item--active");
+  }
+  activeMenuItem = newActiveItem;
+  newActiveItem.classList.add("menu__main__item--active");
+  showSubmenu();
+};
+
+const menuItems = document.querySelectorAll(".menu__main__item");
+
+for (let menuItem of menuItems) {
+  menuItem.onmouseenter = () => onMenuItemMouseEnter(menuItem);
+}
+
+const menu = document.getElementsByClassName("menu")[0];
+menu.onmouseleave = hideSubmenu;
+
+const deactivateMenuItem = () => {
+  activeMenuItem.classList.remove("menu__main__item--active");
+};
+
+const submenu = document.getElementsByClassName("menu__sub")[0];
+submenu.onmouseleave = deactivateMenuItem;
 
 // Server
 
-const getMenu = (data) => {
-  const inputData = data.menu;
-  if (inputData === "a") {
-    return "I got an A";
-  } else if (inputData === "b") {
-    return "I got a B";
-  } else {
-    return "I got something else";
+function getCategories(data) {
+  if (data.category == "top") {
+    if (data.menuItem == "Motors") {
+      return ["Car", "Motorcycle", "Plane", "Trucks", "Wheels"];
+    }
+    if (data.menuItem == "Fashion") {
+      return ["Women's tops", "Men's tops", "Jeans", "Hats"];
+    }
+    return ["Server apple", "Server banana", "Server pear", "Server orange"];
   }
-};
+  if (data.category == "additional") {
+    if (data.menuItem == "Motors") {
+      return ["Tires", "Windshields", "Ski racks", "Doors", "Windows"];
+    }
+    if (data.menuItem == "Fashion") {
+      return ["On sale", "Red stuff", "Gucci", "New Arrivals"];
+    }
+    return ["Server square", "Server circle", "Server oval", "Server diamond"];
+  }
+  return [];
+}
 
 const endpoints = {
   "/": {
     get: () => "hello world",
   },
-  "/menus": {
-    get: getMenu,
+  "/categories": {
+    get: getCategories,
   },
 };
 
@@ -51,34 +111,3 @@ const getFunction = (url, data, callback) => {
 const api = {
   get: getFunction,
 };
-
-// Event
-
-const showSubmenu = () => {
-  const submenu = document.getElementsByClassName("menu__sub")[0];
-  submenu.style.display = "block";
-};
-
-const hideSubmenu = () => {
-  const submenu = document.getElementsByClassName("menu__sub")[0];
-  submenu.style.display = "none";
-};
-
-let lastActive = null;
-const onMenuItemMouseEnter = (item) => {
-  if (lastActive) {
-    lastActive.classList.remove("menu__main__item--active");
-  }
-  lastActive = item;
-  item.classList.add("menu__main__item--active");
-  showSubmenu();
-};
-
-const menuItems = document.querySelectorAll(".menu__main__item");
-
-for (let menuItem of menuItems) {
-  menuItem.onmouseenter = () => onMenuItemMouseEnter(menuItem);
-}
-
-const menu = document.getElementsByClassName("menu")[0];
-menu.onmouseleave = hideSubmenu;
