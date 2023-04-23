@@ -1,3 +1,32 @@
+const HOST = "server.com/";
+
+// Event
+
+const searchInput = document.getElementsByClassName("search__bar__input")[0];
+
+const createSuggestionElement = ({ suggestion, auxiliary }) => {
+	const auxiliaryElement = auxiliary ? `- ${auxiliary}` : "";
+	return `<li class="search__suggestions__list__result">${suggestion}${auxiliaryElement}</li>`;
+};
+
+const onSuggestionsResponse = (data) => {
+	const suggestionsElement = document.getElementsByClassName(
+		"search__suggestions__list"
+	)[0];
+
+	let suggestionsHTML = "";
+	for (let item of data) {
+		suggestionsHTML += createSuggestionElement(item);
+	}
+	suggestionsElement.innerHTML = suggestionsHTML;
+};
+
+const onNewInput = () => {
+	api.get(HOST + "autocomplete", searchInput.value, onSuggestionsResponse);
+};
+
+searchInput.oninput = onNewInput;
+
 // Server
 
 const getRandomString = ({ length }) => {
@@ -12,11 +41,11 @@ const getRandomString = ({ length }) => {
 	}
 	return result;
 };
-console.log(getRandomString({ length: 10 }));
+// console.log(getRandomString({ length: 10 }));
 
 const getRandomInteger = ({ min, max }) =>
 	Math.floor(Math.random() * (max - min) + min);
-console.log(getRandomInteger({ min: 1, max: 10 }));
+// console.log(getRandomInteger({ min: 1, max: 10 }));
 
 const generateSuggestion = (prefix) => {
 	const EXACT_MATCH_RATIO = 0.3;
@@ -58,13 +87,13 @@ const getAutocompleteHandler = (data) => {
 			for (let i = 0; i < 2; i++) {
 				results.push({
 					suggestion,
-					auaxillery: getRandomString({
+					auxiliary: getRandomString({
 						length: getRandomInteger({ min: 5, max: 15 }),
 					}),
 				});
 			}
 		} else {
-			results.push({ suggestion, auaxillery: "" });
+			results.push({ suggestion, auxiliary: "" });
 		}
 	}
 
@@ -84,7 +113,7 @@ const endpoints = {
 
 const getFunction = (url, data, callback) => {
 	const domain = url.substring(0, url.indexOf("/"));
-	const endpoint = url.substirng(url.indexOf("/"));
+	const endpoint = url.substring(url.indexOf("/"));
 
 	callback(endpoints[endpoint].get(data));
 };
