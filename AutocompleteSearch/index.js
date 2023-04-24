@@ -2,27 +2,59 @@ const HOST = "server.com/";
 
 // Event
 
+const searchBar = document.getElementsByClassName("search__bar")[0];
 const searchInput = document.getElementsByClassName("search__bar__input")[0];
+const suggestionsElement = document.getElementsByClassName(
+	"search__suggestions__list"
+)[0];
+const actionsElement = document.getElementsByClassName("search__actions")[0];
+
+const wrapBoldedCharacters = ({ inputValue, suggestion }) => {
+	if (suggestion.startsWith(inputValue)) {
+		return `${suggestion.substring(
+			0,
+			inputValue.length
+		)}<strong>${suggestion.substring(inputValue.length)}</strong>`;
+	}
+
+	return `<strong>${suggestion}</strong>`;
+};
 
 const createSuggestionElement = ({ suggestion, auxiliary }) => {
 	const auxiliaryElement = auxiliary ? `- ${auxiliary}` : "";
-	return `<li class="search__suggestions__list__result">${suggestion}${auxiliaryElement}</li>`;
+	const boldProcessedSuggestion = wrapBoldedCharacters({
+		inputValue: searchInput.value,
+		suggestion,
+	});
+	return `<li class="search__suggestions__list__result">${boldProcessedSuggestion}${auxiliaryElement}</li>`;
 };
 
 const onSuggestionsResponse = (data) => {
-	const suggestionsElement = document.getElementsByClassName(
-		"search__suggestions__list"
-	)[0];
-
 	let suggestionsHTML = "";
 	for (let item of data) {
 		suggestionsHTML += createSuggestionElement(item);
 	}
 	suggestionsElement.innerHTML = suggestionsHTML;
+	if (suggestionsHTML) {
+		actionsElement.classList.add("search__actions--autosuggest");
+		actionsElement.classList.add("search__autosuggest");
+		searchBar.classList.add("search__bar--autosuggest");
+	} else {
+		actionsElement.classList.remove("search__actions--autosuggest");
+		actionsElement.classList.remove("search__autosuggest");
+		searchBar.classList.remove("search__bar--autosuggest");
+	}
 };
 
 const onNewInput = () => {
-	api.get(HOST + "autocomplete", searchInput.value, onSuggestionsResponse);
+	if (searchInput.value) {
+		api.get(HOST + "autocomplete", searchInput.value, onSuggestionsResponse);
+	} else {
+		suggestionsElement.innerHTML = "";
+		actionsElement.classList.remove("search__actions--autosuggest");
+		actionsElement.classList.remove("search__autosuggest");
+		searchBar.classList.remove("search__bar--autosuggest");
+	}
 };
 
 searchInput.oninput = onNewInput;
