@@ -166,3 +166,45 @@ q11 = (arr) => {
 	return [secondLowest, secondGreatest];
 };
 console.log(q11([1, 2, 3, 4, 5]));
+
+// #12 whether a number is perfect
+q12 = (num) => {
+	let sum = 0;
+	for (let i = 1; i * i < num; i++) {
+		if (num % i == 0) {
+			sum += i;
+			sum += num / i;
+		}
+	}
+	return sum == num * 2;
+};
+console.log(q12(8128));
+
+// #13 compute the factors of a positive integer
+q13 = (num) => {
+	let res = [];
+	for (let i = 1; i * i <= num; i++) {
+		if (num % i == 0) {
+			res.push(i);
+			res.push(num / i);
+		}
+	}
+	return res.sort((a, b) => a - b);
+};
+console.log(q13(20));
+
+// #14 convert an amount to coins
+q14 = (num) => {
+	let coins = [50, 25, 10, 5, 2, 1];
+	let i = 0,
+		res = [];
+	while (i < coins.length) {
+		if (num > coins[i]) {
+			res.push(coins[i]);
+		} else {
+			i++;
+		}
+	}
+	return res;
+};
+console.log(q14(46));
