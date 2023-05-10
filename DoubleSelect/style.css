@@ -1,0 +1,19 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+.container {
+	width: 600px;
+	margin: 25px auto;
+	text-align: center;
+}
+
+.dropdown {
+	display: flex;
+	margin: 25px;
+	align-items: center;
+	justify-content: center;
+	gap: 200px;
+}
