@@ -24,7 +24,11 @@ function myFetch(url, options) {
 		if (method == "GET" || method == "DELETE") {
 			xhttp.send();
 		} else if (method == "PUT" || method == "POST") {
-			xhttp.send(body ? JSON.stringify(body) : JSON.stringify({}));
+			if (body) {
+				xhttp.send(JSON.stringify(body));
+			} else {
+				reject(new Error("Must give a body for PUT or POST method. "));
+			}
 		}
 	});
 }
